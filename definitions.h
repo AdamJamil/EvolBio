@@ -23,7 +23,7 @@ typedef std::pair<ll, ll> pl;
 #define Y second
 #define tr(x, v) for (auto x : v)
 
-#define ALLELE_COUNT 4
+#define LOCI 4
 
 #define SEX 0
 // MALE = 1
