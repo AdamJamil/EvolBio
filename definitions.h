@@ -17,6 +17,11 @@ void __print(bool x) {std::cerr << (x ? "true" : "false");}void __print(int x) {
 typedef long long int ll;
 typedef long double ld;
 typedef std::pair<ll, ll> pl;
+typedef std::vector<ll> vl;
+typedef std::vector<pl> vpl;
+typedef std::vector<vl> vvl;
+typedef std::vector<ld> vld;
+typedef std::vector<vld> vvld;
 #define F(i, end) for(ll i = 0; i < (end); ++i)
 #define A(x) (x).begin(), (x).end()
 #define X first
