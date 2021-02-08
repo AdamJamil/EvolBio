@@ -9,11 +9,28 @@ namespace structures {
         ll n, m;
         // adjacency list representation, but only including children
         // first idx MUST represent first x_1
+        // after re-rooting, this is relaxed further to the following:
+            // in order to print, the root must be a leaf.
+            // we can relax even this by changing how print works, so that we print a label instead of the actual idx
         std::vector<std::unordered_set<ll>> c;
         // every non-root vertex has a parent
         vl par;
         // label[i] is the vertex where the edge above it is edge i
+            // unless generated from combo constructor, this will be empty!
         vl label;
+
+        ubtree() = default;
+
+        ubtree empty_copy() {
+            ubtree s;
+            s.c.resize(this->c.size());
+            s.par.resize(this->par.size());
+            s.label.resize(this->label.size());
+            s.n = this->n;
+            s.m = this->m;
+
+            return s;
+        }
 
         ubtree(ll leaves, const vl& choice) {
             n = leaves;
@@ -41,6 +58,34 @@ namespace structures {
                 par[v] = x;
                 par[w] = x;
             }
+        }
+
+        ubtree reroot_at(ll x) {
+            vl fringe{x};
+            sl seen{x};
+            ubtree s = empty_copy();
+
+            while (fringe.size()) {
+                vl next;
+                for (ll u : fringe) {
+                    for (ll v : c[u]) if (!seen.count(v)) {
+                            seen.insert(v);
+                            next.push_back(v);
+                            s.par[v] = u;
+                            s.c[u].insert(v);
+                        }
+                    if (par[u] != -1 and !seen.count(par[u])) {
+                        ll v = par[u];
+                        seen.insert(v);
+                        next.push_back(v);
+                        s.par[v] = u;
+                        s.c[u].insert(v);
+                    }
+                }
+                fringe = next;
+            }
+
+            return s;
         }
 
         friend std::ostream& operator<<(std::ostream& cout, const ubtree& obj) {

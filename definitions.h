@@ -18,6 +18,7 @@ typedef long long int ll;
 typedef long double ld;
 typedef std::pair<ll, ll> pl;
 typedef std::vector<ll> vl;
+typedef std::set<ll> sl;
 typedef std::vector<pl> vpl;
 typedef std::vector<vl> vvl;
 typedef std::vector<ld> vld;

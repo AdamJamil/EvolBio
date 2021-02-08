@@ -37,6 +37,11 @@ namespace algos {
 
         return trees;
     }
+
+    ll fitch(ubtree t) {
+
+    }
+
 } // namespace algos
 
 #endif //EVOLBIO_ALGOS_H
