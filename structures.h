@@ -4,9 +4,11 @@
 
 namespace structures {
     class ubtree {
+    private:
+        vl label;
     public:
         // n is number of leaves (including root !), m is total vertices
-        ll n, m;
+        ll n{}, m{};
         // adjacency list representation, but only including children
         // first idx MUST represent first x_1
         // after re-rooting, this is relaxed further to the following:
@@ -17,11 +19,10 @@ namespace structures {
         vl par;
         // label[i] is the vertex where the edge above it is edge i
             // unless generated from combo constructor, this will be empty!
-        vl label;
 
         ubtree() = default;
 
-        ubtree empty_copy() {
+        ubtree empty_copy() const {
             ubtree s;
             s.c.resize(this->c.size());
             s.par.resize(this->par.size());
@@ -65,7 +66,7 @@ namespace structures {
             sl seen{x};
             ubtree s = empty_copy();
 
-            while (fringe.size()) {
+            while (!fringe.empty()) {
                 vl next;
                 for (ll u : fringe) {
                     for (ll v : c[u]) if (!seen.count(v)) {
@@ -90,7 +91,7 @@ namespace structures {
 
         friend std::ostream& operator<<(std::ostream& cout, const ubtree& obj) {
             std::set<pl> dfs{{0,0}}; // store (depth, val)
-            while (dfs.size()) {
+            while (!dfs.empty()) {
                 auto ptr = dfs.begin(); // have to do it backwards - can't easily erase .rbegin()
                 dfs.erase(ptr);
                 ll u = ptr->second, d = ptr->first;
@@ -100,6 +101,37 @@ namespace structures {
             }
             return cout;
         }
+    }; // class ubtree
+
+    class genome {
+    private:
+        // stores two consecutive bits for one codon
+        // 0 = A
+        // 1 = T
+        // 2 = C
+        // 3 = G
+        bool *codon;
+        size_t sz;
+    public:
+        explicit genome(std::string s) {
+            sz = s.size();
+            codon = (bool *) malloc(s.size() * 2 * sizeof(bool));
+            F(i,s.size())
+                if (s[i] == 'A')      codon[2*i] = 0, codon[2*i + 1] = 0;
+                else if (s[i] == 'T') codon[2*i] = 0, codon[2*i + 1] = 1;
+                else if (s[i] == 'C') codon[2*i] = 1, codon[2*i + 1] = 0;
+                else if (s[i] == 'G') codon[2*i] = 1, codon[2*i + 1] = 1;
+        }
+
+        int operator[](int idx) {
+            return codon[2*idx] + 2 * codon[2*idx + 1];
+        }
+    };
+
+    class phylogeny : public ubtree {
+    public:
+        genome g;
+        explicit phylogeny(genome h) : ubtree(), g(h) {};
     };
 
 } // namespace structures

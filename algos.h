@@ -25,7 +25,7 @@ namespace algos {
         choices[0] = 1;
         F(i,n - 3) choices[i + 1] = 2 + choices[i];
         vl curr(n - 2);
-        while (1) {
+        while (true) {
             trees.emplace_back(n, curr);
             bool inc = true;
             curr[n-3]++;
@@ -38,8 +38,28 @@ namespace algos {
         return trees;
     }
 
-    ll fitch(ubtree t) {
+    void fitch_dfs(vpl &dp, phylogeny &p, ll u) {
+        for (ll v : p.c[u])
+            fitch_dfs(dp, p, v);
+        if (p.c[u].empty()) { // leaf
+            dp[u] = {0, codon_to_mask[p.g[u]]};
+        } else if (p.c[u].size() == 1) { // root
+            ll child = *p.c[u].begin();
+            dp[u] = {dp[child].X + !!(codon_to_mask[p.g[u]] & (ull)dp[child].Y), codon_to_mask[p.g[u]]};
+        } else { // two children
+            ll left = *p.c[u].begin(), right = *(++p.c[u].begin());
+            ull left_mask = dp[left].Y, right_mask = dp[right].Y;
+            dp[u].X = dp[left].X + dp[right].X + !!(right_mask & left_mask);
+            if (!(right_mask & left_mask)) dp[u].Y = right_mask | left_mask;
+            else dp[u].Y = right_mask & left_mask;
+        }
+    }
 
+    // TODO: test.
+    ll fitch(phylogeny p) {
+        vpl dp(p.m);
+        fitch_dfs(dp, p, 0);
+        return dp[0].X;
     }
 
 } // namespace algos
