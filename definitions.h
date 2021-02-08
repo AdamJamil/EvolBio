@@ -4,10 +4,17 @@
 #pragma GCC target ("avx2")
 #pragma GCC optimize ("O3")
 #pragma GCC optimize ("unroll-loops")
-#include <bits/stdc++.h>
+#include <iostream>
 #include <random>
 #include <cmath>
 #include <chrono>
+#include <set>
+#include <map>
+#include <unordered_set>
+#include <unordered_map>
+#include <vector>
+#include <array>
+#include <cassert>
 
 void __print(bool x) {std::cerr << (x ? "true" : "false");}void __print(int x) {std::cerr << x;} void __print(long x) {std::cerr << x;} void __print(long long x) {std::cerr << x;} void __print(unsigned x) {std::cerr << x;} void __print(unsigned long x) {std::cerr << x;} void __print(unsigned long long x) {std::cerr << x;} void __print(float x) {std::cerr << x;} void __print(double x) {std::cerr << x;} void __print(long double x) {std::cerr << x;} void __print(char x) {std::cerr << '\'' << x << '\'';} void __print(const char *x) {std::cerr << '"' << x << '"';} void __print(const std::string &x) {std::cerr << '"' << x << '"';} template<typename T, typename V> void __print(const std::pair<T, V> &x) {std::cerr << '{'; __print(x.first); std::cerr << ','; __print(x.second); std::cerr << '}';} template<typename T> void __print(const T &x) {int f = 0; std::cerr << '{'; for (auto &i: x) std::cerr << (f++ ? "," : ""), __print(i); std::cerr << "}";} void _print() {std::cerr << "]\n";} template <typename T, typename... V> void _print(T t, V... v) {__print(t); if (sizeof...(v)) std::cerr << ", "; _print(v...);}
 #define D(x...) std::cerr << "[" << #x << "] = ["; _print(x);
@@ -24,6 +31,9 @@ typedef std::vector<pl> vpl;
 typedef std::vector<vl> vvl;
 typedef std::vector<ld> vld;
 typedef std::vector<vld> vvld;
+typedef std::vector<bool> vb;
+typedef std::vector<vb> vvb;
+typedef std::vector<std::string> vs;
 #define F(i, end) for(ll i = 0; i < (end); ++i)
 #define A(x) (x).begin(), (x).end()
 #define X first
@@ -45,5 +55,6 @@ std::uniform_real_distribution<ld> uniform_distribution_0_1(0.0,1.0);
 std::uniform_int_distribution<ll> coin_flip(0,1);
 
 ull codon_to_mask[4] = {0b0001, 0b0010, 0b0100, 0b1000};
+
 
 #endif //EVOLBIO_DEFINITIONS_H

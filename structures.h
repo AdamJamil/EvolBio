@@ -1,5 +1,7 @@
 #ifndef EVOLBIO_STRUCTURES_H
 #define EVOLBIO_STRUCTURES_H
+#include <utility>
+
 #include "definitions.h"
 
 namespace structures {
@@ -22,7 +24,7 @@ namespace structures {
 
         ubtree() = default;
 
-        ubtree empty_copy() const {
+        [[nodiscard]] ubtree empty_copy() const {
             ubtree s;
             s.c.resize(this->c.size());
             s.par.resize(this->par.size());
@@ -33,7 +35,8 @@ namespace structures {
             return s;
         }
 
-        ubtree(ll leaves, const vl& choice) {
+        explicit ubtree(const vl& choice) {
+            ll leaves = choice.size() + 2;
             n = leaves;
             m = 2 * n - 2;
             c.resize(m);
@@ -103,35 +106,27 @@ namespace structures {
         }
     }; // class ubtree
 
-    class genome {
-    private:
-        // stores two consecutive bits for one codon
-        // 0 = A
-        // 1 = T
-        // 2 = C
-        // 3 = G
-        bool *codon;
-        size_t sz;
-    public:
-        explicit genome(std::string s) {
-            sz = s.size();
-            codon = (bool *) malloc(s.size() * 2 * sizeof(bool));
-            F(i,s.size())
-                if (s[i] == 'A')      codon[2*i] = 0, codon[2*i + 1] = 0;
-                else if (s[i] == 'T') codon[2*i] = 0, codon[2*i + 1] = 1;
-                else if (s[i] == 'C') codon[2*i] = 1, codon[2*i + 1] = 0;
-                else if (s[i] == 'G') codon[2*i] = 1, codon[2*i + 1] = 1;
-        }
+    enum codon { A, C, T, G };
 
-        int operator[](int idx) {
-            return codon[2*idx] + 2 * codon[2*idx + 1];
+    class genome : public std::vector<codon> {
+    public:
+        genome(const std::string& s)  {
+            this->resize(s.size());
+            std::unordered_map<char, codon> label{{'A', A}, {'C', C}, {'T', T}, {'G', G}};
+            F(i,s.size()) (*this)[i] = label[s[i]];
         }
+        genome(const char s[]) : genome((std::string)s) {};
     };
 
     class phylogeny : public ubtree {
     public:
-        genome g;
-        explicit phylogeny(genome h) : ubtree(), g(h) {};
+        std::vector<genome> g;
+        size_t genome_length;
+        phylogeny(ubtree t, std::vector<genome> h) : ubtree(std::move(t)), g(std::move(h)) {
+            assert(g.size() == n);
+            genome_length = g[0].size();
+            F(i, n) assert(g[i].size() == genome_length); // all genomes must be same length
+        };
     };
 
 } // namespace structures
