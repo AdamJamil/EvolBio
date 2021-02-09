@@ -6,8 +6,29 @@
 using namespace structures;
 
 namespace algos {
+
+    ubtree to_ubtree(vvl gr) {
+        ubtree t((gr.size() + 2) / 2);
+        vl fringe{0};
+        sl seen{0};
+
+        while (!fringe.empty()) {
+            vl next;
+            for (ll u : fringe) {
+                for (ll v : gr[u]) if (!seen.count(v)) {
+                    seen.insert(v);
+                    next.push_back(v);
+                    t.par[v] = u;
+                    t.c[u].insert(v);
+                } else assert(t.par[u] == v); // asserts acyclicity - seen vertices must be the parent
+            }
+            fringe = next;
+        }
+        return t;
+    }
+
     vvld random_distance_matrix(ll n) {
-        vvld dist(n, vld(n)), pos(n, vld(n));;
+        vvld dist(n, vld(n)), pos(n, vld(2 * n));;
         ll dim = 2*n;
         F(i,n) F(j,dim) pos[i][j] = uniform_distribution_0_1(generator) * 5;
         F(i,n) F(j,n) {
@@ -17,6 +38,56 @@ namespace algos {
             dist[i][j] = sqrtl(std::accumulate(A(diff), 0.l));
         }
         return dist;
+    }
+
+    // clustering algos
+
+    ld UPGMA_dist(ll u, ll v, vvld &dist, std::unordered_map<ll, sl> &clusters) {
+        sl c1 = clusters[u], c2 = clusters[v]; // optimization - just pass in the right clusters
+        ld tot = 0;
+        for (ll x : c1) for (ll y : c2) tot += dist[x][y];
+        tot /= c1.size() * c2.size();
+        return tot;
+    }
+
+    ubtree UPGMA(vvld dist) {
+        ll n = dist.size();
+        std::set<std::pair<ld, pl>> choices;
+        F(i,n) FS(j,i+1,n) choices.insert({dist[i][j], {i, j}});
+        vvl gr(2 * (n - 1));
+        std::unordered_map<ll, sl> clusters;
+        F(i,n) clusters[i] = {i};
+        sl rem;
+        F(i,n) rem.insert(i);
+        F(i,n-2) {
+            auto choice_ptr = choices.begin();
+            ll u = choice_ptr->second.first, v = choice_ptr->second.second;
+            gr[u].push_back(i+n);
+            gr[v].push_back(i+n);
+            gr[i+n].push_back(u);
+            gr[i+n].push_back(v);
+            clusters[i+n] = clusters[u];
+            clusters[i+n].insert(A(clusters[v]));
+            TR(j, rem) for (ll x : {u, v}) {
+                choices.erase({dist[j][x], {j, x}});
+                choices.erase({dist[x][j], {x, j}});
+            }
+            rem.erase(u);
+            rem.erase(v);
+            rem.insert(i + n);
+            dist.emplace_back();
+            F(j,i+n) dist[i+n].push_back(UPGMA_dist(i + n, j, dist, clusters));
+            clusters[i+n].insert(i+n); // has to be inserted after UPGMA_dist call
+            F(j,i+n) dist[j].push_back(dist[i+n][j]);
+            dist[i+n].push_back(0);
+            F(j,i+n) if (!clusters[i+n].count(j)) choices.insert({dist[j][i+n], {j, i+n}});
+        }
+        auto choice_ptr = choices.begin();
+        ll u = choice_ptr->second.first, v = choice_ptr->second.second;
+        gr[u].push_back(v);
+        gr[v].push_back(u);
+
+        return to_ubtree(gr);
     }
 
     std::vector<ubtree> gen_trees(ll n) {
@@ -55,7 +126,6 @@ namespace algos {
         }
     }
 
-    // TODO: test.
     ll fitch(phylogeny p) {
         ll ans = 0;
         vpl dp(p.m);

@@ -4,9 +4,8 @@
 #include "algos.h"
 
 int main() {
-    auto trees = algos::gen_trees(4);
-    std::cout << *trees.begin() << std::endl;
-    phylogeny p(*trees.begin(), {"ATC", "ATG", "ACC", "ACG"});
-    std::cout << algos::fitch(p) << std::endl;
+    sl vals{1};
+    vvld dist = {{0,2,5,5}, {2,0,5,5}, {5,5,0,2}, {5,5,2,0}};
+    std::cout << algos::UPGMA(dist);
     return 0;
 }

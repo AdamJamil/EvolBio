@@ -24,23 +24,21 @@ namespace structures {
 
         ubtree() = default;
 
-        [[nodiscard]] ubtree empty_copy() const {
-            ubtree s;
-            s.c.resize(this->c.size());
-            s.par.resize(this->par.size());
-            s.label.resize(this->label.size());
-            s.n = this->n;
-            s.m = this->m;
-
-            return s;
-        }
-
-        explicit ubtree(const vl& choice) {
-            ll leaves = choice.size() + 2;
+        explicit ubtree(ll leaves) {
             n = leaves;
             m = 2 * n - 2;
             c.resize(m);
             par.resize(m);
+            par[0] = -1;
+        }
+
+        [[nodiscard]] ubtree empty_copy() const {
+            ubtree s(n);
+            s.label.resize(this->label.size());
+            return s;
+        }
+
+        explicit ubtree(const vl& choice) : ubtree(choice.size() + 2) {
             c[0].insert(1);      // children of root
             par[0] = -1;            // parent of root
             par[1] = 0;             // parent of second leaf
