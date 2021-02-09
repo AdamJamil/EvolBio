@@ -5,6 +5,7 @@
 #include "definitions.h"
 
 namespace structures {
+
     class ubtree {
     private:
         vl label;
@@ -104,6 +105,36 @@ namespace structures {
         }
     }; // class ubtree
 
+    class graph : public vvl {
+    public:
+        void join(ll u, ll v) {
+            (*this)[u].push_back(v);
+            (*this)[v].push_back(u);
+        }
+
+        ubtree to_ubtree() {
+            ubtree t((size() + 2) / 2);
+            vl fringe{0};
+            sl seen{0};
+
+            while (!fringe.empty()) {
+                vl next;
+                for (ll u : fringe) {
+                    for (ll v : (*this)[u]) if (!seen.count(v)) {
+                            seen.insert(v);
+                            next.push_back(v);
+                            t.par[v] = u;
+                            t.c[u].insert(v);
+                        } else assert(t.par[u] == v); // asserts acyclicity - seen vertices must be the parent
+                }
+                fringe = next;
+            }
+            return t;
+        }
+
+        using vvl::vvl;
+    }; // class graph
+
     enum codon { A, C, T, G };
 
     class genome : public std::vector<codon> {
@@ -114,7 +145,7 @@ namespace structures {
             F(i,s.size()) (*this)[i] = label[s[i]];
         }
         genome(const char s[]) : genome((std::string)s) {};
-    };
+    }; // class genome
 
     class phylogeny : public ubtree {
     public:
@@ -125,7 +156,7 @@ namespace structures {
             genome_length = g[0].size();
             F(i, n) assert(g[i].size() == genome_length); // all genomes must be same length
         };
-    };
+    }; // class phylogeny
 
 } // namespace structures
 

@@ -7,26 +7,6 @@ using namespace structures;
 
 namespace algos {
 
-    ubtree to_ubtree(vvl gr) {
-        ubtree t((gr.size() + 2) / 2);
-        vl fringe{0};
-        sl seen{0};
-
-        while (!fringe.empty()) {
-            vl next;
-            for (ll u : fringe) {
-                for (ll v : gr[u]) if (!seen.count(v)) {
-                    seen.insert(v);
-                    next.push_back(v);
-                    t.par[v] = u;
-                    t.c[u].insert(v);
-                } else assert(t.par[u] == v); // asserts acyclicity - seen vertices must be the parent
-            }
-            fringe = next;
-        }
-        return t;
-    }
-
     vvld random_distance_matrix(ll n) {
         vvld dist(n, vld(n)), pos(n, vld(2 * n));;
         ll dim = 2*n;
@@ -54,7 +34,7 @@ namespace algos {
         ll n = dist.size();
         std::set<std::pair<ld, pl>> choices;
         F(i,n) FS(j,i+1,n) choices.insert({dist[i][j], {i, j}});
-        vvl gr(2 * (n - 1));
+        graph gr(2 * (n - 1));
         std::unordered_map<ll, sl> clusters;
         F(i,n) clusters[i] = {i};
         sl rem;
@@ -62,8 +42,7 @@ namespace algos {
         F(i,n-2) {
             auto ptr = choices.begin();
             for (ll x : {ptr->Y.X, ptr->Y.Y}) {
-                gr[x].push_back(i + n);
-                gr[i + n].push_back(x);
+                gr.join(x, i + n);
                 clusters[i + n].insert(A(clusters[x]));
                 TR(j, rem) {
                     choices.erase({dist[j][x], {j, x}});
@@ -81,10 +60,9 @@ namespace algos {
         }
         auto ptr = choices.begin();
         ll u = ptr->second.first, v = ptr->second.second;
-        gr[u].push_back(v);
-        gr[v].push_back(u);
+        gr.join(u, v);
 
-        return to_ubtree(gr);
+        return gr.to_ubtree();
     }
 
     std::vector<ubtree> gen_trees(ll n) {
