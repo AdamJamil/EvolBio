@@ -38,7 +38,7 @@ typedef std::vector<std::string> vs;
 #define A(x) (x).begin(), (x).end()
 #define X first
 #define Y second
-#define TR(x, v) for (auto &x : v)
+#define TR(x, v) for (const auto &(x) : v)
 template <typename T> std::vector<T> set_to_vector(std::set<T> s) { return {A(s)}; }
 #define DS(x) D(set_to_vector(x))
 

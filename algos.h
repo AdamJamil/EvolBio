@@ -60,20 +60,17 @@ namespace algos {
         sl rem;
         F(i,n) rem.insert(i);
         F(i,n-2) {
-            auto choice_ptr = choices.begin();
-            ll u = choice_ptr->second.first, v = choice_ptr->second.second;
-            gr[u].push_back(i+n);
-            gr[v].push_back(i+n);
-            gr[i+n].push_back(u);
-            gr[i+n].push_back(v);
-            clusters[i+n] = clusters[u];
-            clusters[i+n].insert(A(clusters[v]));
-            TR(j, rem) for (ll x : {u, v}) {
-                choices.erase({dist[j][x], {j, x}});
-                choices.erase({dist[x][j], {x, j}});
+            auto ptr = choices.begin();
+            for (ll x : {ptr->Y.X, ptr->Y.Y}) {
+                gr[x].push_back(i + n);
+                gr[i + n].push_back(x);
+                clusters[i + n].insert(A(clusters[x]));
+                TR(j, rem) {
+                    choices.erase({dist[j][x], {j, x}});
+                    choices.erase({dist[x][j], {x, j}});
+                }
+                rem.erase(x);
             }
-            rem.erase(u);
-            rem.erase(v);
             rem.insert(i + n);
             dist.emplace_back();
             F(j,i+n) dist[i+n].push_back(UPGMA_dist(i + n, j, dist, clusters));
@@ -82,8 +79,8 @@ namespace algos {
             dist[i+n].push_back(0);
             F(j,i+n) if (!clusters[i+n].count(j)) choices.insert({dist[j][i+n], {j, i+n}});
         }
-        auto choice_ptr = choices.begin();
-        ll u = choice_ptr->second.first, v = choice_ptr->second.second;
+        auto ptr = choices.begin();
+        ll u = ptr->second.first, v = ptr->second.second;
         gr[u].push_back(v);
         gr[v].push_back(u);
 
